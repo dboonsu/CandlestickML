@@ -30,7 +30,7 @@ def displayCandlesticks(hist, numCandles):
     plt.show()
 
 
-spy = yf.Ticker("DIS")
+spy = yf.Ticker("IBM")
 hist = pd.DataFrame(spy.history(period="max"))
 hist = hist.drop(columns=["Volume", "Dividends", "Stock Splits"])
 hist.to_csv("historical.csv")
@@ -59,7 +59,7 @@ for idx, val in hist.iterrows():
     if (val['CDL3BLACKCROWS'] != 0):
         temp = foundPattern(hist, 3)
         CDL3BLACKCROWS = CDL3BLACKCROWS.append(temp, ignore_index=True)
-        displayCandlesticks(hist, 5)
+        # displayCandlesticks(hist, 5)
     if (val['CDL3LINESTRIKE'] != 0):
         temp = foundPattern(hist, 4)
         if (val['CDL3LINESTRIKE'] == 100):
