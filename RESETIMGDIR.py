@@ -3,6 +3,8 @@ import os
 def reset():
     dir = "IMGDIR/"
 
+    # Checks if the IMGDIR is there
+    #  If not, creates the IMGDIR and all necessary directories
     if (not(os.path.isdir("IMGDIR/"))):
         os.mkdir("IMGDIR/")
         os.mkdir("IMGDIR/CDL3BLACKCROWS")
@@ -11,6 +13,7 @@ def reset():
         os.mkdir("IMGDIR/CDLEVENINGSTAR")
         os.mkdir("IMGDIR/CDLSTICKSANDWICH")
 
+    # Removes all of the images in the directories
     for folder in os.scandir(dir):
         for file in os.scandir(folder):
             os.remove(file)

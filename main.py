@@ -10,22 +10,34 @@ import RESETIMGDIR
 
 def saveCandlestickPattern(hist, numCandles, pattern):
     x = range(0,len(hist))
+
+    # Creates a new matplot figure
     fig, ax = plt.subplots(nrows=1, ncols=1)
-    ax.set_facecolor((.9, .7, .7))
+
+    # Directly iterates over where the candlesticks are
     for idx_, val_ in hist.loc[idx - (numCandles - 1):idx].iterrows():
-        plt.plot([x[idx_], x[idx_]],
-                 [val_['Low'], val_['High']],
-                 color='black')
+        # Plots the low/high lines at on the x axis
+        plt.plot([x[idx_], x[idx_]], [val_['Low'], val_['High']], color='black')
+
+        # Determines whether the candle is white or black
         if (val_["Close"] - val_["Open"] > 0):
             curColor = "white"
         else:
             curColor = "black"
-        rect1 = matplotlib.patches.Rectangle((x[idx_] + -.1, val_['Open']), .2, (val_['Close'] - val_['Open']),
+
+        # Adds the candle element to the candle
+        rect = matplotlib.patches.Rectangle((x[idx_] + -.1, val_['Open']), .2, (val_['Close'] - val_['Open']),
                                              color=curColor, zorder=10)
-        ax.add_patch(rect1)
+        ax.add_patch(rect)
+
+    # Sees how many figures are in the pattern folder
     num = len(os.listdir("IMGDIR/" + pattern))
+
+    # Saves the image as a new file
     name = "IMGDIR/" + pattern + "/" + str(num) + ".jpg"
     plt.savefig(name)
+
+    # Closes the figure
     plt.close(fig)
 
 
@@ -52,37 +64,37 @@ def saveCandlestickPattern(hist, numCandles, pattern):
 #         ax.set_facecolor((.9, .7, .7))
 
 if __name__ == "__main__":
+
+    # 1 if you want to clear all the files in IMGDIR and remake the IMGDIR
     if (1):
         RESETIMGDIR.reset()
         exit(0)
 
+    # Sets the ticker
     spy = yf.Ticker("SPY")
+
+    # Opens the historical data as a df
     hist = pd.DataFrame(spy.history(period="max"))
+
+    # Drops unnecessary columns
     hist = hist.drop(columns=["Volume", "Dividends", "Stock Splits"])
-    # hist.to_csv("historical.csv")
-    # hist = pd.read_csv("historical.csv")
-    candle_names = talib.get_function_groups()['Pattern Recognition']
+
+    # Changes the index from dates to numbers
     hist.reset_index(inplace=True)
 
-    CDL3BLACKCROWS = pd.DataFrame()
-    CDL3LINESTRIKEBULL = pd.DataFrame()
-    CDL3LINESTRIKEBEAR = pd.DataFrame()
-    CDLEVENINGSTAR = pd.DataFrame()
-    CDLSTICKSANDWICH = pd.DataFrame()
-
-    op = hist['Open']
-    hi = hist['High']
-    lo = hist['Low']
-    cl = hist['Close']
-
-    for candle in candle_names:
-        hist[candle] = getattr(talib, candle)(op, hi, lo, cl)
     # Identifies candle patterns in historical data
     # Adds several new columns for each pattern
     #  When a pattern is identified, it will add a -100 or 100 for downward trends or positive trends
     #  Otherwise, the value will be 0
+    candle_names = talib.get_function_groups()['Pattern Recognition']
+    op = hist['Open']
+    hi = hist['High']
+    lo = hist['Low']
+    cl = hist['Close']
+    for candle in candle_names:
+        hist[candle] = getattr(talib, candle)(op, hi, lo, cl)
 
-    # Detects when a candle pattern has been identified and
+    # Detects when a candle pattern has been identified and saves the pattern as an image
     for idx, val in hist.iterrows():
         if (val['CDL3BLACKCROWS'] != 0):
             saveCandlestickPattern(hist, 3, 'CDL3BLACKCROWS')
@@ -95,64 +107,3 @@ if __name__ == "__main__":
             saveCandlestickPattern(hist, 3, 'CDLEVENINGSTAR')
         if (val['CDLSTICKSANDWICH'] != 0):
             saveCandlestickPattern(hist, 3, 'CDLSTICKSANDWICH')
-
-    # CDL3BLACKCROWS.to_csv("CDL3BLACKCROWS", mode='a', header=False)
-    # CDL3LINESTRIKEBULL.to_csv("CDL3LINESTRIKEBULL", mode='a', header=False)
-    # CDL3LINESTRIKEBEAR.to_csv("CDL3LINESTRIKEBEAR", mode='a', header=False)
-    # CDLEVENINGSTAR.to_csv("CDLEVENINGSTAR", mode='a', header=False)
-    # CDLSTICKSANDWICH.to_csv("CDLSTICKSANDWICH", mode='a', header=False)
-
-
-    # test = pd.read_csv("CDL3BLACKCROWS")
-    # displayPattern(test, 3)
-
-#### BACKUP STUFF ####
-# Detects when a candle pattern has been identified and
-#     for idx, val in hist.iterrows():
-#         # high/low lines
-#         # break
-#         if (val['CDL3BLACKCROWS'] != 0):
-#             saveCandlestickPattern(hist, 3, 'CDL3BLACKCROWS')
-#             temp = foundPattern(hist, 3)
-#             CDL3BLACKCROWS = CDL3BLACKCROWS.append(temp, ignore_index=True)
-#         if (val['CDL3LINESTRIKE'] != 0):
-#             temp = foundPattern(hist, 4)
-#             if (val['CDL3LINESTRIKE'] == 100):
-#                 CDL3LINESTRIKEBULL = CDL3LINESTRIKEBULL.append(temp, ignore_index=True)
-#             elif (val['CDL3LINESTRIKE'] == -100):
-#                 CDL3LINESTRIKEBEAR = CDL3LINESTRIKEBEAR.append(temp, ignore_index=True)
-#             # plt.show()
-#         if (val['CDLEVENINGSTAR'] != 0):
-#             temp = foundPattern(hist, 3)
-#             CDLEVENINGSTAR = CDLEVENINGSTAR.append(temp, ignore_index=True)
-#             # displayCandlesticks(hist, 3)
-#             # plt.show()
-#         if (val['CDLSTICKSANDWICH'] != 0):
-#             temp = foundPattern(hist, 3)
-#             CDLSTICKSANDWICH = CDLSTICKSANDWICH.append(temp, ignore_index=True)
-#             # displayCandlesticks(hist, 3)
-#
-# def foundPattern(hist, numCandles):
-#     temp = {}
-#     for idx_, val_ in hist.loc[idx - (numCandles - 1):idx].iterrows():
-#         currCandle = idx_ - idx + (numCandles - 1)
-#         temp.update({'Open ' + str(currCandle): val_['Open'], 'High ' + str(currCandle): val_['High'],
-#                      'Low ' + str(currCandle): val_['Low'], 'Close ' + str(currCandle): val_['Close']})
-#     return temp
-#
-# def displayCandlesticks(hist, numCandles):
-#     x = range(0,len(hist))
-#     fig, ax = plt.subplots(nrows=1, ncols=1)
-#     ax.set_facecolor((.9, .7, .7))
-#     for idx_, val_ in hist.loc[idx - (numCandles - 1):idx].iterrows():
-#         plt.plot([x[idx_], x[idx_]],
-#                  [val_['Low'], val_['High']],
-#                  color='black')
-#         if (val_["Close"] - val_["Open"] > 0):
-#             curColor = "white"
-#         else:
-#             curColor = "black"
-#         rect1 = matplotlib.patches.Rectangle((x[idx_] + -.1, val_['Open']), .2, (val_['Close'] - val_['Open']),
-#                                              color=curColor, zorder=10)
-#         ax.add_patch(rect1)
-#     plt.show()
