@@ -7,6 +7,9 @@ import os
 import talib
 
 import RESETIMGDIR
+import convolve
+import maxPooling
+
 
 def saveCandlestickPattern(hist, numCandles, pattern):
     x = range(0,len(hist))
@@ -21,9 +24,9 @@ def saveCandlestickPattern(hist, numCandles, pattern):
 
         # Determines whether the candle is white or black
         if (val_["Close"] - val_["Open"] > 0):
-            curColor = "white"
+            curColor = "green"
         else:
-            curColor = "black"
+            curColor = "red"
 
         # Adds the candle element to the candle
         rect = matplotlib.patches.Rectangle((x[idx_] + -.1, val_['Open']), .2, (val_['Close'] - val_['Open']),
@@ -35,7 +38,7 @@ def saveCandlestickPattern(hist, numCandles, pattern):
 
     # Saves the image as a new file
     name = "IMGDIR/" + pattern + "/" + str(num) + ".jpg"
-    plt.savefig(name)
+    plt.savefig(name, bbox_inches = "tight")
 
     # Closes the figure
     plt.close(fig)
@@ -64,9 +67,24 @@ def saveCandlestickPattern(hist, numCandles, pattern):
 #         ax.set_facecolor((.9, .7, .7))
 
 if __name__ == "__main__":
+    # path = "IMGDIR/CDL3BLACKCROWS/1.jpg"
+    # filter = 0
+    # # kernel = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+    # kernel = np.array([[0,-1,0],[-1,5,-1],[0,-1,0]])
+    # filteredImage = convolve.convolve(path, kernel)
+    # path = "IMGDIR/CDL3BLACKCROWS/1A.jpg"
+    # maxPooling.maxPooling(path, size = 2, stride = 2)
+    #
+    # path = "IMGDIR/CDL3BLACKCROWS/1B.jpg"
+    # # kernel = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
+    # filteredImage = convolve.convolve(path, kernel)
+    # path = "IMGDIR/CDL3BLACKCROWS/1A.jpg"
+    # maxPooling.maxPooling(path, size = 4, stride = 4)
+
+
 
     # 1 if you want to clear all the files in IMGDIR and remake the IMGDIR
-    if (1):
+    if (0):
         RESETIMGDIR.reset()
         exit(0)
 
@@ -74,10 +92,10 @@ if __name__ == "__main__":
     spy = yf.Ticker("SPY")
 
     # Opens the historical data as a df
-    hist = pd.DataFrame(spy.history(period="max"))
+    hist = pd.read_csv("historical.csv")#pd.DataFrame(spy.history(period="max"))
 
     # Drops unnecessary columns
-    hist = hist.drop(columns=["Volume", "Dividends", "Stock Splits"])
+    # hist = hist.drop(columns=["Volume", "Dividends", "Stock Splits"])
 
     # Changes the index from dates to numbers
     hist.reset_index(inplace=True)
@@ -104,6 +122,6 @@ if __name__ == "__main__":
             elif (val['CDL3LINESTRIKE'] == -100):
                 saveCandlestickPattern(hist, 3, 'CDL3LINESTRIKEBEAR')
         if (val['CDLEVENINGSTAR'] != 0):
-            saveCandlestickPattern(hist, 3, 'CDLEVENINGSTAR')
+            saveCandlestickPattern(hist, 0, 'CDLEVENINGSTAR')
         if (val['CDLSTICKSANDWICH'] != 0):
-            saveCandlestickPattern(hist, 3, 'CDLSTICKSANDWICH')
+            saveCandlestickPattern(hist, 0, 'CDLSTICKSANDWICH')
