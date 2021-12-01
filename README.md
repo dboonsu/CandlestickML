@@ -36,11 +36,11 @@ Four to train the model, just leave the three conditional statements at 0
 
 ```python
     # 1 if you want to clear all the files in IMGDIR and remake the IMGDIR
-    if (1):
+    if (0):
         DIRHELP.reset()
 
     # 1 to read and import candlestick charts
-    if (1):
+    if (0):
         acquireCandlestickCharts.acquire()
 
     # 1 for testing trained models
