@@ -1,58 +1,76 @@
-import math
-
 import numpy as np
-import cv2
 
-def maxPooling(path, size = 2, stride = 2):
+def avgPooling(image, stride=2):
+    # Takes image which is a single channel MxNxN (grayscale) image where:
+    #  M is the depth of the image, or number of channels
+    #  N is the height and width of the image
+    # Also takes stride, which is O where:
+    #  O is how far the window will pool
+    # Will return a smaller, pooled image
 
-    image = cv2.imread(path)
-    imageHeight, imageWidth, imageChannels = image.shape
+    # Obtain values of the image's shape
+    imageDepth, imageHeight, imageWidth = image.shape
 
-    outputHeight = ((imageHeight - size) / stride) + 1
-    outputWidth = ((imageWidth - size) / stride) + 1
+    # Calculate the size of the pooled image
+    pooledHeight = int(imageHeight/stride)
 
-    outputHeight = math.ceil(outputHeight)
-    outputWidth = math.ceil(outputWidth)
-    outputDepth = imageChannels
+    # Initialize output vectors
+    # The convolved image will be
+    output = np.zeros((imageDepth, pooledHeight, pooledHeight), dtype=(np.float64))
+    indices = np.zeros((imageDepth, pooledHeight, pooledHeight), dtype=(np.int64, 2))
 
-    output = np.zeros((outputHeight, outputWidth, outputDepth))
-    for z in range(outputDepth):
-        for y in range(0, imageHeight, size):
-            for x in range(0, imageWidth, size):
-                # output[int(y/size), int(x/size)] = np.max(image[y: y + size, x: x + size])
-                output[int(y/size), int(x/size), z] = np.max(image[y: y + size, x: x + size, z])
+    # Goes over every channel
+    for n in range(imageDepth):
+        # Goes over the height and width of the image
+        for i in range(pooledHeight):
+            for j in range(pooledHeight):
+                # Selects a window and calculate the mean value of the window
+                region = image[n, (2 * i):(2 * i + 2), (2 * j):(2 * j + 2)]
+                output[n, i, j] = np.mean(region)
 
-    cv2.imwrite(path, output)
+                # You need to keep travel of the indices of the max value for the gradient
+                indexI, indexJ = np.unravel_index(np.argmax(region), region.shape)
+                indices[n, i, j] = [2 * i + indexI, 2 * j + indexJ]
 
-# import math
-#
-# import numpy as np
-# import cv2
-#
-# def maxPooling(path, size = 2, stride = 2):
-#
-#     image = cv2.imread(path)
-#     image = cv2.cvtColor(src=image, code=cv2.COLOR_BGR2GRAY)
-#     imageHeight, imageWidth = image.shape
-#
-#     outputHeight = ((imageHeight - size) / stride) + 1
-#     outputWidth = ((imageWidth - size) / stride) + 1
-#
-#
-#     outputHeight = math.ceil(outputHeight)
-#     outputWidth = math.ceil(outputWidth)
-#
-#     output = np.zeros((outputHeight, outputWidth))
-#
-#     print(imageHeight)
-#     print(imageWidth)
-#     print(outputHeight)
-#     print(outputWidth)
-#
-#     for y in range(0, imageHeight, size):
-#         for x in range(0, imageWidth, size):
-#             output[int(y/size), int(x/size)] = np.max(image[y: y + size, x: x + size])
-#
-#     print(output)
-#
-#     cv2.imwrite("IMGDIR/CDL3BLACKCROWS/1B.jpg", output)
+    return output, indices
+
+def maxPooling(image, stride=2):
+    # Takes image which is a single channel MxNxN (grayscale) image where:
+    #  M is the depth of the image, or number of channels
+    #  N is the height and width of the image
+    # Also takes stride, which is O where:
+    #  O is how far the window will pool
+    # Will return a smaller, pooled image
+
+    # Obtain values of the image's shape
+    imageDepth, imageHeight, imageWidth = image.shape
+
+    # Calculate the size of the pooled image
+    pooledHeight = int(imageHeight/stride)
+
+    # Initialize output vectors
+    # The convolved image will be
+    output = np.zeros((imageDepth, pooledHeight, pooledHeight), dtype=(np.float64))
+    indices = np.zeros((imageDepth, pooledHeight, pooledHeight), dtype=(np.int64, 2))
+
+    # Goes over every channel
+    for n in range(imageDepth):
+        # Goes over the height and width of the image
+        for i in range(pooledHeight):
+            for j in range(pooledHeight):
+                # Selects a window and finds the maximum value of the window
+
+                # Selecting the window
+                region = image[n, (2 * i):(2 * i + 2), (2 * j):(2 * j + 2)]
+
+                # Finding the max
+                output[n, i, j] = np.max(region)
+
+                # Get the local indices of the local max of the region
+                # You need to keep track of the indices of the max value for the gradient
+                localX, localY = np.unravel_index(np.argmax(region), region.shape)
+
+                # Must shift the indices of the entire image
+                indices[n, i, j] = [2 * i + localX, 2 * j + localY]
+
+    return output, indices

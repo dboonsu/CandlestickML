@@ -1,3 +1,5 @@
+# David McCormick - DTM190000
+
 import cv2
 import numpy as np
 import os
@@ -12,15 +14,14 @@ import testModel
 import trainModel
 
 if __name__ == "__main__":
-    # np.set_printoptions(threshold=sys.maxsize)
-
-    # Whether or not you want to acquire candlestick charts
+    # Important for printing out entire weights and kernels
+    np.set_printoptions(threshold=sys.maxsize)
 
     # 1 if you want to clear all the files in IMGDIR and remake the IMGDIR
     if (0):
         DIRHELP.reset()
 
-    # AT BRT
+    # Whether or not you want to acquire candlestick charts
     if (0):
         acquireCandlestickCharts.acquire()
 
@@ -39,15 +40,13 @@ if __name__ == "__main__":
 
     # These are necessary because some of the candlestick patterns
     #  such as Evening Star is MUCH more frequent than Abandoned Baby
-    MNOIPC = 1000 # Max Number of Images Per Class
+    MNOIPC = 10 # Max Number of Images Per Class
     CNOI = 0 # Current Number of Images Per Class
     NF = 0 # Number of folders
     for folder in os.scandir(dir):
         print(folder.name)
         CNOI = 0
         NF += 1
-        if (NF > 5):
-            break
         for file in os.scandir(folder):
             # If we have reached the max number of files in this folder, we will skip to the next one
             if MNOIPC == CNOI:
@@ -114,21 +113,22 @@ if __name__ == "__main__":
     epochs, avgLosses, accuracy, kernel1, kernel2, weights = trainModel.train(trainImages, trainLabels, testImages,
                                                                               testLabels, numEpochs, learningRate,
                                                                               kernel1, kernel2, weights)
-    print(repr(kernel1))
-    print("kernel1")
-    print("-----------------")
-    print(repr(kernel2))
-    print("kernel2")
-    print("-----------------")
-    print(repr(weights))
-    print("Weights")
-    print("-----------------")
-    print(avgLosses)
-    print("avgLosses")
-    print("-----------------")
-    print(accuracy)
-    print("accuracy")
-    print("-----------------")
+    with (open("output.txt", "a")) as f:
+        print(repr(kernel1), file=f)
+        print("kernel1", file=f)
+        print("-----------------", file=f)
+        print(repr(kernel2), file=f)
+        print("kernel2", file=f)
+        print("-----------------", file=f)
+        print(repr(weights), file=f)
+        print("Weights", file=f)
+        print("-----------------", file=f)
+        print(avgLosses, file=f)
+        print("avgLosses", file=f)
+        print("-----------------", file=f)
+        print(accuracy, file=f)
+        print("accuracy", file=f)
+        print("-----------------", file=f)
     exit(0)
 
     # Example of calculating the weight dimensions
