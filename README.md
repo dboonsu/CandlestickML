@@ -5,6 +5,10 @@ This README should help you navigate the Candlestick ML project
 
 ## Installation
 
+```bash
+git clone https://https://github.com/dboonsu/CandlestickML/
+```
+
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install all of the necessary files
 
 ```bash
