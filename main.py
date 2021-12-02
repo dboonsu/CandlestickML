@@ -26,7 +26,7 @@ if __name__ == "__main__":
         acquireCandlestickCharts.acquire()
 
     # For testing trained models
-    if (1):
+    if (0):
         testModel.test()
 
     # #### FOR WHEN YOU HAVE THE ENTIRE IMGDIR
@@ -89,14 +89,14 @@ if __name__ == "__main__":
     # labelsPD.to_csv("labels.csv", index=False)
 
     # This is for the TA's sake, just reads from github
-    imagesReshapeCSV = pd.read_csv("images.csv")
+    imagesReshapeCSV = pd.read_csv("https://raw.githubusercontent.com/dboonsu/CandlestickML/main/images.csv")
     imagesReshapeCSV.columns = imagesReshapeCSV.columns.astype(int)
     imagesReshapeCSVNP = imagesReshapeCSV.to_numpy()
     images = imagesReshapeCSVNP.reshape(imagesReshapeCSVNP.shape[0], imagesReshapeCSVNP.shape[1] // 28, 28)
 
     NF = 9
 
-    labelsCSV = pd.read_csv("labels.csv")
+    labelsCSV = pd.read_csv("https://raw.githubusercontent.com/dboonsu/CandlestickML/main/labels.csv")
     labelsCSVNP = labelsCSV.to_numpy()
     labels = labelsCSVNP.reshape(14974,)
 
