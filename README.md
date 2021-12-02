@@ -52,3 +52,7 @@ Four to train the model, just leave the three conditional statements at 0
     #  28x28 is the number of pixels in each image
     images=np.zeros((28,28))...
 ```
+## Data
+The data for the images has been compressed into "images.csv" and "labels.csv".
+It gets reshaped from 2D into 3D properly. Additionally, it saves you from downloading the entirety of the images.
+The whole folder for the data can be found [here](https://github.com/dboonsu/CandlestickData).

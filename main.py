@@ -26,55 +26,82 @@ if __name__ == "__main__":
         acquireCandlestickCharts.acquire()
 
     # For testing trained models
-    if (0):
+    if (1):
         testModel.test()
 
-    # Stores all of the images in Mx28x28
-    #  M is the total number of images
-    #  28x28 is the number of pixels in each image
-    images=np.zeros((28,28))
+    # #### FOR WHEN YOU HAVE THE ENTIRE IMGDIR
+    # #### FOR THE TEACHER ASSISTANT'S SAKE, I MADE TWO CSVS AND THEY ARE READ FROM GITHUB
+    # # Stores all of the images in Mx28x28
+    # #  M is the total number of images
+    # #  28x28 is the number of pixels in each image
+    # images=np.zeros((28,28))
+    #
+    # # Labels stores all of the labels for the images in 1xM
+    # labels=np.zeros((1))
+    # dir = "IMGDIR/"
+    #
+    # # These are necessary because some of the candlestick patterns
+    # #  such as Evening Star is MUCH more frequent than Abandoned Baby
+    # MNOIPC = 2000 # Max Number of Images Per Class
+    # CNOI = 0 # Current Number of Images Per Class
+    # NF = 0 # Number of folders
+    # for folder in os.scandir(dir):
+    #     print(folder.name)
+    #     CNOI = 0
+    #     NF += 1
+    #     for file in os.scandir(folder):
+    #         # If we have reached the max number of files in this folder, we will skip to the next one
+    #         if MNOIPC == CNOI:
+    #             break
+    #
+    #         # Formats the current file into something readable for cv2
+    #         path = "IMGDIR/" + folder.name + "/" + file.name
+    #
+    #         # Reads the current image with cv2 as grayscale
+    #         current = cv2.imread(path, 0)
+    #
+    #         # Resizes the image to be 28x28
+    #         resize = cv2.resize(current, (28, 28), interpolation=cv2.INTER_AREA)
+    #
+    #         # Appends the current image onto the Mx28x28 array
+    #         images = np.dstack((images, resize))
+    #
+    #         # Appends the current label onto the Mx1 array
+    #         labels = np.append(labels, folder.name)
+    #
+    #         CNOI+=1
+    #
+    # # Tranposes the images from 28x28xM to Mx28x28
+    # images = np.transpose(images, (2, 0, 1))
+    #
+    # # Arrays were formatted with np.zeros, removes that single entry
+    # images = np.delete(images, 0, 0)
+    # labels = np.delete(labels, 0)
+    # print(images.shape)
+    #
+    # #####
+    #
+    # ##### THIS STUFF WAS FOR MAKING THE CSV'S FOR THE TA's SAKE
+    # imagesReshape = images.reshape(images.shape[0], -1)
+    # imagesReshapePD = pd.DataFrame(imagesReshape)
+    # imagesReshapePD.to_csv("images.csv", index=False)
+    # labelsPD = pd.DataFrame(labels)
+    # labelsPD.to_csv("labels.csv", index=False)
 
-    # Labels stores all of the labels for the images in 1xM
-    labels=np.zeros((1))
-    dir = "IMGDIR/"
+    # This is for the TA's sake, just reads from github
+    imagesReshapeCSV = pd.read_csv("images.csv")
+    imagesReshapeCSV.columns = imagesReshapeCSV.columns.astype(int)
+    imagesReshapeCSVNP = imagesReshapeCSV.to_numpy()
+    images = imagesReshapeCSVNP.reshape(imagesReshapeCSVNP.shape[0], imagesReshapeCSVNP.shape[1] // 28, 28)
 
-    # These are necessary because some of the candlestick patterns
-    #  such as Evening Star is MUCH more frequent than Abandoned Baby
-    MNOIPC = 10 # Max Number of Images Per Class
-    CNOI = 0 # Current Number of Images Per Class
-    NF = 0 # Number of folders
-    for folder in os.scandir(dir):
-        print(folder.name)
-        CNOI = 0
-        NF += 1
-        for file in os.scandir(folder):
-            # If we have reached the max number of files in this folder, we will skip to the next one
-            if MNOIPC == CNOI:
-                break
+    NF = 9
 
-            # Formats the current file into something readable for cv2
-            path = "IMGDIR/" + folder.name + "/" + file.name
+    labelsCSV = pd.read_csv("labels.csv")
+    labelsCSVNP = labelsCSV.to_numpy()
+    labels = labelsCSVNP.reshape(14974,)
 
-            # Reads the current image with cv2 as grayscale
-            current = cv2.imread(path, 0)
-
-            # Resizes the image to be 28x28
-            resize = cv2.resize(current, (28, 28), interpolation=cv2.INTER_AREA)
-
-            # Appends the current image onto the Mx28x28 array
-            images = np.dstack((images, resize))
-
-            # Appends the current label onto the Mx1 array
-            labels = np.append(labels, folder.name)
-
-            CNOI+=1
-
-    # Tranposes the images from 28x28xM to Mx28x28
-    images = np.transpose(images, (2, 0, 1))
-
-    # Arrays were formatted with np.zeros, removes that single entry
-    images = np.delete(images, 0, 0)
-    labels = np.delete(labels, 0)
+    # print(np.array_equal(images, images1))
+    # print(np.array_equal(labels, labels1))
 
     # Turns the classes into unique numbers
     labels = pd.factorize(labels)[0]
